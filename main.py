@@ -1,7 +1,6 @@
 import requests
 import json
 from tabulate import tabulate
-from termcolor import colored
 from colorama import Fore, Style, init
 
 init(autoreset=True)
@@ -10,11 +9,12 @@ def get_character_data(id):
     url = f"https://rickandmortyapi.com/api/character/{id}"
     response = requests.get(url)
 
-    if response.status_code == 200:
-        data = response.json()
-        return data
-    else:
-        return None
+    response.raise_for_status()
+
+    if "error" in response.json():
+        raise ValueError(response.json()["error"])
+    
+    return response.json()
 
 def print_colored(message, color=Fore.WHITE):
     print(color + message + Style.RESET_ALL)
@@ -22,9 +22,6 @@ def print_colored(message, color=Fore.WHITE):
 def save_to_json(data, filename):
     with open(filename, 'w') as json_file:
         json.dump(data, json_file, indent=4)
-
-def print_styled(message, color='white', attrs=None):
-    print(colored(message, color, attrs=attrs))
 
 def display_character_data(data):
     table_data = [
@@ -41,17 +38,27 @@ def display_character_data(data):
     print(table)
 
 def main():
-    id = input("Digite o ID do personagem: ")
-    data = get_character_data(id)
-
-    if data is not None:
+    try:
+        id = input("Digite o ID do personagem: ")
+        data = get_character_data(id)
         display_character_data(data)
 
         filename = f"character_{id}.json"
         save_to_json(data, filename)
         print_colored(f"Dados salvos em {filename}", Fore.GREEN)
-    else:
-        print_styled("Personagem não encontrado.", color='red', attrs=['bold'])
+    
+
+    # caso a API esteja OFF
+    except requests.exceptions.HTTPError as e:
+        print_colored(f"Erro na requisição: {e}", Fore.RED)
+
+    # caso personagem não existe
+    except ValueError as e:
+        print_colored(f"Erro: {e}", Fore.RED)
+
+    # Erros alatorios.
+    except Exception as e:
+        print_colored(f"Erro inesperado: {e}", Fore.YELLOW)
 
 if __name__ == "__main__":
     main()
