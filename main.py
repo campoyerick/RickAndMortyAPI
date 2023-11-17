@@ -2,6 +2,9 @@ import requests
 import json
 from tabulate import tabulate
 from termcolor import colored
+from colorama import Fore, Style, init
+
+init(autoreset=True)
 
 def get_character_data(id):
     url = f"https://rickandmortyapi.com/api/character/{id}"
@@ -12,6 +15,9 @@ def get_character_data(id):
         return data
     else:
         return None
+
+def print_colored(message, color=Fore.WHITE):
+    print(color + message + Style.RESET_ALL)
 
 def save_to_json(data, filename):
     with open(filename, 'w') as json_file:
@@ -43,7 +49,7 @@ def main():
 
         filename = f"character_{id}.json"
         save_to_json(data, filename)
-        print_styled(f"Dados salvos em {filename}", color='white', attrs=['bold'])
+        print_colored(f"Dados salvos em {filename}", Fore.GREEN)
     else:
         print_styled("Personagem não encontrado.", color='red', attrs=['bold'])
 
