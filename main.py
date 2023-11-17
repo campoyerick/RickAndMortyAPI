@@ -27,7 +27,7 @@ def main():
 
     if data is not None:
         print_colored("Nome: " + data["name"], Fore.CYAN)
-        print_colored("Status: " + data["status"], Fore.GREEN)
+        print_colored(aa"Status: " + data["status"], Fore.GREEN)
         print_colored("Espécie: " + data["species"], Fore.YELLOW)
         print_colored("Tipo: " + data["type"], Fore.YELLOW)
         print_colored("Gênero: " + data["gender"], Fore.MAGENTA)
